@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> WebGl Linea </title>
+
+</head>
+<body>
+  <canvas id="canvas" width="320" height="320">
+  </canvas>
+</body>
+<script lenguage = "javascript">
+
+var appContext = {
+  gl: null,
+  vertexShader: null,
+  fragmentShader: null,
+  shaderProgram: null,
+  vertexBuffer: null,
+  indexBuffer: null
+};
+
+function start() {
+  var canvas = document.getElementById('canvas');
+
+  appContext.gl = initWebGL(canvas);
+  initShaders();
+  loadGeometry();
+  render();
+};
+
+function initWebGL(canvas) {
+  var line = null;
+  
+  try {
+    line = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  } catch(e) {
+    console.error(e);
+  }
+  
+
+  if (!line) {
+    alert('Imposible inicializar WebGL. Tu navegador puede no soportarlo.');
+    line = null;
+  } else {
+    line.clearColor(1.0, 1.0, 1.0, 1.0);
+    line.enable(line.DEPTH_TEST);
+    line.depthFunc(line.LEQUAL);
+    line.clear(line.COLOR_BUFFER_BIT | line.DEPTH_BUFFER_BIT);
+  }
+  
+  return line;
+};
+
+function initShaders() {
+  var gl = appContext.gl;
+
+  var vertexShaderCode = `
+attribute vec3 vertex;
+    
+void main(void) {
+  gl_Position = vec4(vertex, 1.0);
+}
+  `;
+  var fragmentShaderCode = `
+void main(void) {
+  gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+}
+  `;
+  // Creamos el shader
+  appContext.vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  // Le pasamos el código
+  gl.shaderSource(appContext.vertexShader, vertexShaderCode);
+  // Compilamos el código
+  gl.compileShader(appContext.vertexShader);
+
+  // Fragment Shader
+
+
+  // Lo mismo
+  appContext.fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(appContext.fragmentShader, fragmentShaderCode);
+  gl.compileShader(appContext.fragmentShader);
+
+  // Finalmente creamos el programa de shaders
+  appContext.shaderProgram = gl.createProgram();
+
+  // Le añadimos los shaders
+  gl.attachShader(appContext.shaderProgram, appContext.vertexShader);
+  gl.attachShader(appContext.shaderProgram, appContext.fragmentShader);
+  gl.linkProgram(appContext.shaderProgram);
+    
+}
+
+function loadGeometry() {
+  var gl = appContext.gl;
+
+  var vertex = [
+       0,  0.5, 0.0,
+      0, -0.5, 0.0,
+       0.5, -0.5, 0.0
+  ];
+
+  var index = [0, 1, 2];
+  
+  appContext.vertexBuffer = gl.createBuffer();
+  appContext.indexBuffer = gl.createBuffer();
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, appContext.vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertex), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, appContext.indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(index), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+}
+
+function render() {
+  var gl = appContext.gl;
+  gl.useProgram(appContext.shaderProgram);
+
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, appContext.vertexBuffer);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, appContext.indexBuffer);
+
+  var vertexLocation = gl.getAttribLocation(appContext.shaderProgram, 'vertex');
+  gl.vertexAttribPointer(vertexLocation, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(vertexLocation);
+
+  gl.drawElements(gl.LINES, 3, gl.UNSIGNED_SHORT, 0);
+}
+start();
+</script>
+</html>

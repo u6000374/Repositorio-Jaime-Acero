@@ -66,25 +66,19 @@ void main(void) {
   gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
 }
   `;
-  // Creamos el shader
+
   appContext.vertexShader = gl.createShader(gl.VERTEX_SHADER);
-  // Le pasamos el código
+
   gl.shaderSource(appContext.vertexShader, vertexShaderCode);
-  // Compilamos el código
+  // Compilamos el cÃ³digo
   gl.compileShader(appContext.vertexShader);
 
-  // Fragment Shader
-
-
-  // Lo mismo
   appContext.fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(appContext.fragmentShader, fragmentShaderCode);
   gl.compileShader(appContext.fragmentShader);
 
-  // Finalmente creamos el programa de shaders
   appContext.shaderProgram = gl.createProgram();
 
-  // Le añadimos los shaders
   gl.attachShader(appContext.shaderProgram, appContext.vertexShader);
   gl.attachShader(appContext.shaderProgram, appContext.fragmentShader);
   gl.linkProgram(appContext.shaderProgram);

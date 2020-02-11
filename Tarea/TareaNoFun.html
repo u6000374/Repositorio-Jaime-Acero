@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>tarea</title>
+<style>
+html, body { margin: 0; padding: 0; overflow: hidden; }
+</style>
+</head>
+<body>
+<script src="js/three.min.js"></script>
+<script>
+
+	var scene, aspect, camera, renderer, eje1, eje2, brazo1, brazo2;
+	var geoEsfera, geoCilindro, geoCilindro;
+
+		init();
+		render();
+		animate()
+		var upArrow = false;
+		var downArrow = false;
+		var	leftArrow = false;
+		var	rightArrow = false;		
+		var	xArrow = false;
+		var	zArrow = false;
+	function init(){	
+	scene = new THREE.Scene();
+	aspect = window.innerWidth / window.innerHeight;
+	camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+	
+	//Entrada de teclado
+	var onKeyDown = function ( event ) {
+				switch ( event.keyCode ) {
+					case 38: 
+						upArrow = true;
+						break;
+					case 40: 
+						downArrow = true;
+						break;
+					case 37:
+						leftArrow = true;
+						break;
+					case 39:
+						rightArrow = true;
+						break;
+					case 88:
+						xArrow = true;
+						break;
+					case 90:
+						zArrow = true;
+						break;}
+						};
+	var onKeyUp = function ( event ) {
+			switch ( event.keyCode ) {
+				case 38: 
+					upArrow = false;
+					break;
+				case 40:
+					downArrow = false;
+					break;
+				case 37:
+					leftArrow = false;
+					break;
+				case 39:
+					rightArrow = false;
+					break;
+					case 88:
+						xArrow = false;
+						break;
+					case 90:
+						zArrow = false;
+						break;}
+					};
+					
+			document.addEventListener( 'keydown', onKeyDown, false );
+			document.addEventListener( 'keyup', onKeyUp, false );			
+					
+	//Geometria 1 Rectangulo
+	
+	geoRec = new THREE.Geometry();
+	var resCub=10;
+	
+	    for( var i = 0; i < resCub; i++){
+            for( var j = 0; j < resCub; j++){
+				for( var k = 0; k < resCub; k++){
+                   var punto1 = new THREE.Vector3();
+                   punto1.x =  (i/5);
+                   punto1.y = (j/5);
+                   punto1.z = k/5;
+
+                    geoRec.vertices.push( punto1 );
+					}
+				}
+			}
+			
+			var matRec = new THREE.PointsMaterial( { color: 'green', size: 0.1 } );
+	
+			
+	//Geometria 2 Esfera		
+	
+	geoEsfera = new THREE.Geometry();
+	var increRadE= Math.PI/25;
+	var resES=2;
+	
+		//Esfera sacada de: http://esferaopengl.blogspot.com/;
+	        for( var i = 0; i <  Math.PI; i+=increRadE){
+                for( var j = 0; j < 2*Math.PI; j+=increRadE){
+                    var punto2 = new THREE.Vector3();
+					
+					punto2.z = 1 * Math.cos(j) * Math.sin(i) ;
+                    punto2.y = 1 * Math.cos(i) ;
+                    punto2.x = 1 * Math.sin(j) * Math.sin(i) ;
+                    geoEsfera.vertices.push( punto2 );
+                }
+            }
+			
+			
+			var matEsf = new THREE.PointsMaterial( { color: 'red', size: 0.1 } );
+	
+	
+	
+	//Geometria 3 Cilindro
+	
+	geoCilindro = new THREE.Geometry();
+			
+        var increRadC= Math.PI/45;
+			var resCi=10;
+			for( var i = 0; i <  2*Math.PI; i+=increRadC){
+			for ( var j=0; j < resCi*2; j++){
+			 var punto3 = new THREE.Vector3();
+					punto3.z = (1 * Math.sin(i)) ;
+                    punto3.y = (j/resCi);
+                    punto3.x = (1 * Math.cos(i)) ;
+                    geoCilindro.vertices.push( punto3 );
+			}
+			}
+
+			var matCil = new THREE.PointsMaterial( { color: 'yellow', size: 0.1 } );
+	
+	
+	
+	//crear los objetos
+	
+	base = new THREE.Points(geoRec, matRec);
+	scene.add(base);
+	
+	eje1 = new THREE.Points(geoEsfera, matEsf);
+	eje1.translateY(2);
+	eje1.translateZ(1);
+	eje1.translateX(1);
+	base.add(eje1);
+	
+	brazo1 = new THREE.Points(geoCilindro, matCil);
+	brazo1.translateY(0.5);
+	eje1.add(brazo1);
+	
+	eje2 = new THREE.Points(geoEsfera, matEsf);
+	eje2.translateY(2.8);
+	eje1.add(eje2);
+	
+	brazo2 = new THREE.Points(geoCilindro, matCil);
+	eje2.add(brazo2);
+	
+	
+	eje3 = new THREE.Points(geoEsfera, matEsf);	
+	eje3.translateY(2.5);
+	brazo2.add(eje3);
+	
+			camera.position.x = 10;
+			camera.position.y = 10;	 
+		  	camera.position.z = 15;
+	}
+	
+		function animate() {
+        render();
+        requestAnimationFrame( animate );
+    }
+
+	
+	function render(){
+
+		
+		var tx=0, ty=0, tz=0, s=1;
+		
+		if(upArrow) {
+			tz=0.1;
+		}
+		if(downArrow) {
+			tz=-0.1;
+		}
+		if(leftArrow) {
+			tx=0.1;
+		}
+		if(rightArrow) {
+			tx=-0.1;
+		}
+		if(xArrow) {
+			ty=0.1;
+		}
+		if(zArrow) {
+			ty=-0.1;
+		}
+	
+		/*	
+		//MATRIZ DE TRASLACIÓN
+		var s = new THREE.Matrix4();
+		s.set( 	1, 0, 0, tx,
+				0, 1, 0, ty, 
+				0, 0, 1, tz,
+				0, 0, 0, 1	);
+		brazo1.applyMatrix(s);	
+		brazo1.elementsNeedUpdate = true;
+		*/
+		base.rotateY(ty);
+		base.elementsNeedUpdate = true;
+		eje1.rotateX(tx);
+		eje1.elementsNeedUpdate = true;
+		eje2.rotateZ(tz);
+		eje2.elementsNeedUpdate = true;
+			camera.lookAt( 0, 0, 0 );
+			renderer.render( scene, camera );
+	}
+</script>
+</body>
+</html>

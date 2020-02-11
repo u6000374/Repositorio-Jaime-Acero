@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tarea</title>
+	<style>
+	html, body { margin: 0; padding: 0; overflow: hidden; }
+	</style>
+	</head>
+<body>
+	<script src="js/three.min.js"></script>
+	<script>
+	
+	var scene, aspect, camera, renderer;
+	var upArrow=false, downArrow=false;
+		init();
+		rectangulo('blue',-0.4,-2,0.4);
+		esfera(1,-1, 'red');
+		cilindro(1.8,1,-0.5, 'yellow');
+		esfera(1,1.5, 'red');
+		cilindro(2,1,2, 'yellow');
+		var thetaSum=0;
+		var positivo=false;
+		render();
+		animate();
+		
+	function init(){
+			scene = new THREE.Scene();
+			aspect = window.innerWidth / window.innerHeight;
+			camera = new THREE.PerspectiveCamera( 45, aspect, 0.1, 1000);
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			
+			
+			
+		var onKeyDown = function ( event ) {
+				switch ( event.keyCode ) {
+					case 38: // TRASLADAR ADELANTE
+						upArrow = true;
+						break;
+					case 40: // TRASLADAR ATRÁS
+						downArrow = true;
+						break;}
+						
+	}
+	
+		var onKeyUp = function ( event ) {
+				switch ( event.keyCode ) {
+					case 38: // TRASLADAR
+						upArrow = false;
+						break;
+					case 40: // TRASLADAR
+						downArrow = false;
+						break;
+				}
+			}
+	}
+	
+	
+	
+	function rectangulo(col,enx,eny,tam){
+	
+	var geoRec = new THREE.Geometry();
+	var res=10;
+	
+	    for( var i = 0; i < res; i++){
+            for( var j = 0; j < res; j++){
+				for( var k = 0; k < res; k++){
+                    var punto = new THREE.Vector3();
+                   punto.x =  (i/(res*tam))+enx;
+                    punto.y = (j/(res*tam))+eny;
+                    punto.z = k/(res*tam);
+
+                    geoRec.vertices.push( punto );
+                }
+            }
+			}
+			
+			var matPunto = new THREE.PointsMaterial( { color: col, size: 0.1 } );
+			var rec = new THREE.Points( geoRec, matPunto );
+			
+			scene.add( rec );
+	
+	}
+	
+	function esfera(rad, eny, col){
+	
+	var geoEsfera = new THREE.Geometry();
+	increRad= Math.PI/25;
+	var res=2;
+	
+	//Esfera sacada de: http://esferaopengl.blogspot.com/;
+	            for( var i = 0; i <  Math.PI; i+=increRad){
+                for( var j = 0; j < 2*Math.PI; j+=increRad){
+                    var punto = new THREE.Vector3();
+					
+					punto.z = rad * Math.cos(j) * Math.sin(i) ;
+                    punto.y = rad * Math.cos(i) + eny;
+                    punto.x = rad * Math.sin(j) * Math.sin(i) ;
+                    geoEsfera.vertices.push( punto );
+                }
+            }
+			
+			
+			var matPunto = new THREE.PointsMaterial( { color: col, size: 0.1 } );
+			var esfera = new THREE.Points( geoEsfera, matPunto );
+			scene.add( esfera );
+	
+	}
+	
+
+	
+
+	function cilindro(alt, anch, eny, col){
+			
+		    var geoCilindro = new THREE.Geometry();
+			
+            increRad= Math.PI/45;
+			var res=10;
+			for( var i = 0; i <  2*Math.PI; i+=increRad){
+			for ( var j=0; j < res*alt; j++){
+			 var punto = new THREE.Vector3();
+					punto.z = (anch * Math.sin(i)) ;
+                    punto.y = (j/res) + eny;
+                    punto.x = (anch * Math.cos(i)) ;
+                    geoCilindro.vertices.push( punto );
+			}
+			}
+
+			var matPunto = new THREE.PointsMaterial( { color: col, size: 0.1 } );
+			var cilindro = new THREE.Points( geoCilindro, matPunto );
+			
+			scene.add( cilindro );
+			}
+
+			
+	
+	
+	/*function Cil(alt){
+	        var geoCilindro = new THREE.Geometry();
+            var zTemp = 0;
+            var res = 25.0;
+            for( var i = 0; i < res; i++){
+                for( var j = 0; j < res; j++){
+                    var punto = new THREE.Vector3();
+                    punto.x = (alt / res ) * Math.cos( ( j * 2.0 * Math.PI ) / res) ;
+                    punto.y = 5.0 * i / res;
+                    punto.z = (alt / res ) * Math.sin( ( j * 2.0 * Math.PI ) / res) ;
+                    geoCilindro.vertices.push( punto );
+                }
+            }
+			var matPunto = new THREE.PointsMaterial( { color: 0xFFFFFF, size: 0.1 } );
+			var cilindro = new THREE.Points( geoCilindro, matPunto );
+			scene.add( cilindro );
+	}*/
+	
+	function animate() {
+        render();
+        requestAnimationFrame( animate );
+    }
+	
+	function render(){
+			camera.position.x = 10;
+			camera.position.y = 10;	 
+		  	camera.position.z = 15;
+
+        camera.lookAt( 0, 0, 0 );
+        renderer.render( scene, camera );
+	
+
+
+	}
+		
+		
+</script>
+</body>
+</html>
